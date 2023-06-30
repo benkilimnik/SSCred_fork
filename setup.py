@@ -6,7 +6,8 @@ from setuptools import setup
 
 PACKAGE_NAME = "sscred"
 INSTALL_REQUIRES = [
-    "petlib @ git+https://github.com/spring-epfl/petlib.git",
+    "petlib_fork",
+    # "petlib @ git+https://github.com/spring-epfl/petlib.git",
     "attrs",
     "zksk"
 ]
@@ -30,6 +31,7 @@ with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
 
 
 setup(
+    name="sscred_fork",
     packages=[PACKAGE_NAME],
     install_requires=INSTALL_REQUIRES,
     setup_requires=SETUP_REQUIRES,
