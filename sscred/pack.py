@@ -60,7 +60,6 @@ def _default(obj, enable_inherited_classes=False):
     return petlib.pack.default(obj)
 
 
-
 def add_msgpack_support_slots(cls, ext, add_cls_methods=True):
     """Adds serialization support,
 
@@ -78,7 +77,20 @@ def add_msgpack_support_slots(cls, ext, add_cls_methods=True):
         ext: an unique code for the msgpack's Ext hook
     """
     def enc(obj):
-        return packb({key: getattr(obj, key) for key in obj.__slots__})
+        data = {key: getattr(obj, key) for key in obj.__slots__}
+        kv = {}
+
+        if hasattr(obj, 'bc_param'):
+            kv['bc_param'] = obj.bc_param
+        if hasattr(obj, 'pk'):
+            kv['pk'] = obj.pk
+        if hasattr(obj, 'z'):
+            kv['z'] = obj.z
+        if hasattr(obj, 'param'):
+            kv['param'] = obj.param
+        data.update(kv)
+
+        return packb(data)
 
     def dec(data):
         obj = cls.__new__(cls)
@@ -160,8 +172,10 @@ def register_all_classes():
     add_msgpack_support_slots(blind_signature.AbePublicKey, COUNTER_BASE+9)
     add_msgpack_support_slots(blind_signature.AbePrivateKey, COUNTER_BASE+10)
     add_msgpack_support_slots(blind_signature.AbeSignature, COUNTER_BASE+11)
-    add_msgpack_support_slots(blind_signature.SignerCommitMessage, COUNTER_BASE+12)
-    add_msgpack_support_slots(blind_signature.SignerResponseMessage, COUNTER_BASE+13)
+    add_msgpack_support_slots(
+        blind_signature.SignerCommitMessage, COUNTER_BASE+12)
+    add_msgpack_support_slots(
+        blind_signature.SignerResponseMessage, COUNTER_BASE+13)
     # ACL
     add_msgpack_support_slots(acl.ACLParam, COUNTER_BASE+14)
     add_msgpack_support_slots(acl.ACLIssuerPrivateKey, COUNTER_BASE+15)
@@ -174,9 +188,13 @@ def register_all_classes():
     add_msgpack_support(NIZK, COUNTER_BASE+21, add_cls_methods=False)
 
     # Added later
-    add_msgpack_support_slots(blind_signature.SignerCommitmentInternalState, COUNTER_BASE+22)
-    add_msgpack_support_slots(blind_signature.UserBlindedChallengeInternalState, COUNTER_BASE+23)
-    add_msgpack_support_slots(blind_signature.BlindedChallengeMessage, COUNTER_BASE+24)
+    add_msgpack_support_slots(
+        blind_signature.SignerCommitmentInternalState, COUNTER_BASE+22)
+    add_msgpack_support_slots(
+        blind_signature.UserBlindedChallengeInternalState, COUNTER_BASE+23)
+    add_msgpack_support_slots(
+        blind_signature.BlindedChallengeMessage, COUNTER_BASE+24)
+
 
 register_all_classes()
 
@@ -185,6 +203,6 @@ def main():
     import doctest
     doctest.testmod(verbose=True)
 
+
 if __name__ == '__main__':
     main()
-
