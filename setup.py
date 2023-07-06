@@ -9,7 +9,8 @@ INSTALL_REQUIRES = [
     "petlib_fork",
     # "petlib @ git+https://github.com/spring-epfl/petlib.git",
     "attrs",
-    "zksk"
+    # "zksk"
+    "zksk_fork"
 ]
 SETUP_REQUIRES = ["pytest-runner"]
 TEST_REQUIRES = ["pytest"]
