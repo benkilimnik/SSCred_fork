@@ -114,6 +114,21 @@ class PedersenParameters:
         C += self.group.wsum(values, self.HS[:len(values)])
 
         return PedersenCommitment(C), PedersenRandom(rand)
+    
+    def extend_commit(self, old_commitment: PedersenCommitment, new_values: Collection[Bn]) -> PedersenCommitment:
+        """Extend a commitment with new values.
+
+        Args:
+            old_commitment (PedersenCommitment): old commitment
+            new_values (Bn mod q): new values to be added to the commitment
+
+        Returns:
+            PedersenCommitment: extended commitment
+        """
+        self.expand_params_len(len(self.HS) + len(new_values))
+        C = old_commitment.commit + self.group.wsum(new_values, self.HS[:len(new_values)])
+
+        return PedersenCommitment(C)
 
 
 @attr.s

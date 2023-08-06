@@ -88,6 +88,8 @@ def add_msgpack_support_slots(cls, ext, add_cls_methods=True):
             kv['z'] = obj.z
         if hasattr(obj, 'param'):
             kv['param'] = obj.param
+        if hasattr(obj, 'zeta'):
+            kv['zeta'] = obj.zeta
         data.update(kv)
 
         return packb(data)
