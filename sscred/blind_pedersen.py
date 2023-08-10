@@ -30,7 +30,7 @@ from zksk import Secret, DLRep
 from zksk.base import NIZK
 from zksk.exceptions import StatementMismatch
 
-from .commitment import PedersenCommitment, PedersenParameters
+from .commitment import PedersenCommitment, PedersenParameters, PedersenRandom
 
 
 class BlindedPedersenParam(PedersenParameters):
@@ -119,7 +119,7 @@ class BlindedPedersenParam(PedersenParameters):
         values = [self.process_raw_value(raw) for raw in raw_values]
         return super(BlindedPedersenParam, self).commit(values)
     
-    def extend_commit(self, raw_values: List[Union[Bn, str, bytes]]) -> PedersenCommitment:
+    def extend_commit(self, old_commitment: PedersenCommitment, old_rand: PedersenRandom, raw_values: List[Union[Bn, str, bytes]]) -> PedersenCommitment:
         """Extend a commitment with new values.
 
         Args:
@@ -129,7 +129,7 @@ class BlindedPedersenParam(PedersenParameters):
             PedersenCommitment: extended commitment
         """
         values = [self.process_raw_value(raw) for raw in raw_values]
-        return super(BlindedPedersenParam, self).extend_commit(values)
+        return super(BlindedPedersenParam, self).extend_commit(old_commitment, old_rand, values)
 
 
     def blind_commit(self, raw_values, blindness_rand=None, h_rand=None):

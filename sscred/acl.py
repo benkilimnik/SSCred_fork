@@ -193,19 +193,19 @@ class ACLIssuer(AbeSigner):
         g = self.param.g
         return super()._commit(lambda rnd, commit=commit, g=g: commit + rnd * g)
     
-    def extend_commit(self, old_commitment: PedersenCommitment, new_values: Collection[Attribute]) -> PedersenCommitment:
-        """Extend a Pedersen commitment with new values.
+    # def extend_commit(self, old_commitment: PedersenCommitment, new_values: Collection[Attribute]) -> PedersenCommitment:
+    #     """Extend a Pedersen commitment with new values.
 
-        Args:
-            old_commitment (PedersenCommitment): old commitment
-            new_values (Collection[Bn]): new values to be added to the commitment
+    #     Args:
+    #         old_commitment (PedersenCommitment): old commitment
+    #         new_values (Collection[Bn]): new values to be added to the commitment
 
-        Returns:
-            PedersenCommitment: new, extended commitment
-        """
-        bc_param: BlindedPedersenParam = self.public.bc_param
-        new_pcommit: PedersenCommitment = bc_param.extend_commit(old_commitment, new_values)
-        return new_pcommit
+    #     Returns:
+    #         PedersenCommitment: new, extended commitment
+    #     """
+    #     bc_param: BlindedPedersenParam = self.public.bc_param
+    #     new_pcommit: PedersenCommitment = bc_param.extend_commit(old_commitment, new_values)
+    #     return new_pcommit
 
     
     def abe_commit(
@@ -223,6 +223,17 @@ class ACLIssuer(AbeSigner):
         commit = commitment.commit
         g = self.param.g
         return super()._commit(lambda rnd, commit=commit, g=g: commit + rnd * g)
+    
+    def verify_proof(
+        self,
+        prove_attr_msg: ProveAttrKnowledgeMessage,
+        ) -> None:
+        valid_commit = prove_attr_msg.commit.verify_proof(
+            pparam = self.public.bc_param,
+            proof = prove_attr_msg.nizk_proof
+        )
+        if not valid_commit:
+            raise ACLAttributeProofIsInvalid("Attribute proof is invalid.")
 
 
 class ACLUser(AbeUser):
@@ -296,9 +307,12 @@ class ACLUser(AbeUser):
         Returns:
             PedersenCommitment: new, extended commitment
         """
-        self.attributes += tuple(new_values)
         bc_param: BlindedPedersenParam = self.public.bc_param
-        new_pcommit: PedersenCommitment = bc_param.extend_commit(old_commitment, new_values)
+        self.attributes += tuple(new_values)
+        new_pcommit, new_prand = bc_param.extend_commit(old_commitment, self.prand, new_values)
+        self.pcommit, self.prand = new_pcommit, new_prand
+
+        self.user_attr_commitment = new_pcommit
         return new_pcommit
 
 
