@@ -1,4 +1,4 @@
-__version__ = "0.2.21"
+__version__ = "0.2.23"
 __title__ = "sscred"
 __author__ = "Kasra EdalatNejad"
 __email__ = "kasra.edalat@epfl.ch"

@@ -115,6 +115,8 @@ class PedersenParameters:
 
         return PedersenCommitment(C), PedersenRandom(rand)
     
+    # def add_commitments(self, old_commit: PedersenCommitment, new_commit: PedersenCommitment, old_rand: PedersenRandom) -> PedersenCommitment:
+
     def extend_commit(self, old_commitment: PedersenCommitment, old_rand: PedersenRandom, new_values: Collection[Bn]) -> PedersenCommitment:
         """Extend a commitment with new values.
 

@@ -59,7 +59,7 @@ import attr
 from petlib.bn import Bn
 from petlib.ec import EcGroup, EcPt
 
-from .commitment import PedersenCommitment, PedersenProof
+from .commitment import PedersenCommitment, PedersenProof, PedersenRandom
 from .blind_pedersen import BlPedersenCommitment, BlPedersenPrivate, BlPedersenProof, BlindedPedersenParam
 from .blind_signature import (
     AbeParam,
@@ -165,8 +165,7 @@ class ACLIssuer(AbeSigner):
         self.private: ACLIssuerPrivateKey
         self.public: ACLIssuerPublicKey
         super().__init__(private, public)
-
-
+    
     def commit(
             self,
             prove_attr_msg: ProveAttrKnowledgeMessage
@@ -192,6 +191,19 @@ class ACLIssuer(AbeSigner):
         commit = prove_attr_msg.commit.commit
         g = self.param.g
         return super()._commit(lambda rnd, commit=commit, g=g: commit + rnd * g)
+    
+    def pedersen_commit(self, attributes: Collection[Attribute]) -> PedersenCommitment:
+        """
+
+        Args:
+            attributes (Collection[Attribute]): _description_
+
+        Returns:
+            PedersenCommitment: _description_
+        """
+        bc_param: BlindedPedersenParam = self.public.bc_param
+        self.pcommit, self.prand = bc_param.commit(attributes)
+        return self.pcommit, self.prand
     
     # def extend_commit(self, old_commitment: PedersenCommitment, new_values: Collection[Attribute]) -> PedersenCommitment:
     #     """Extend a Pedersen commitment with new values.
@@ -297,8 +309,18 @@ class ACLUser(AbeUser):
         self.user_attr_commitment = self.pcommit
         return ProveAttrKnowledgeMessage(commit=self.pcommit, nizk_proof=proof)
     
+    def add_commitment(self, new_attributes: Collection[Attribute], new_commit: PedersenCommitment, new_rand: PedersenRandom) -> PedersenCommitment:
+        """Add two Pedersen commitments, updating randomness stored with the user.
+           Note: For the user to prove possession of the commitment in future steps, they need to know 
+           the combined randomness (self.prand + new_rand), which is stored in the user's state."""
+        self.prand.rand += new_rand.rand
+        self.pcommit.commit += new_commit.commit
+        self.user_attr_commitment = self.pcommit
+        self.attributes += tuple(new_attributes)
+        return self.pcommit
+    
     def extend_commit(self, old_commitment: PedersenCommitment, new_values: Collection[Attribute]) -> PedersenCommitment:
-        """Extend a Pedersen commitment with new values.
+        """Extend a Pedersen commitment with new values. 
 
         Args:
             old_commitment (PedersenCommitment): old commitment

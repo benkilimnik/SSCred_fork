@@ -119,6 +119,19 @@ class BlindedPedersenParam(PedersenParameters):
         values = [self.process_raw_value(raw) for raw in raw_values]
         return super(BlindedPedersenParam, self).commit(values)
     
+    # def add_commitments(self, old_commit: PedersenCommitment, new_commit: PedersenCommitment, old_rand: PedersenRandom = None) -> PedersenCommitment:
+    #     """
+
+    #     Args:
+    #         old_commit (PedersenCommitment): _description_
+    #         new_commit (PedersenCommitment): _description_
+    #         old_rand (PedersenRandom): _description_
+
+    #     Returns:
+    #         PedersenCommitment: _description_
+    #     """
+    #     return super(BlindedPedersenParam, self).add_commitments(old_commit, new_commit, old_rand)
+    
     def extend_commit(self, old_commitment: PedersenCommitment, old_rand: PedersenRandom, raw_values: List[Union[Bn, str, bytes]]) -> PedersenCommitment:
         """Extend a commitment with new values.
 
