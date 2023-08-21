@@ -205,21 +205,6 @@ class ACLIssuer(AbeSigner):
         self.pcommit, self.prand = bc_param.commit(attributes)
         return self.pcommit, self.prand
     
-    # def extend_commit(self, old_commitment: PedersenCommitment, new_values: Collection[Attribute]) -> PedersenCommitment:
-    #     """Extend a Pedersen commitment with new values.
-
-    #     Args:
-    #         old_commitment (PedersenCommitment): old commitment
-    #         new_values (Collection[Bn]): new values to be added to the commitment
-
-    #     Returns:
-    #         PedersenCommitment: new, extended commitment
-    #     """
-    #     bc_param: BlindedPedersenParam = self.public.bc_param
-    #     new_pcommit: PedersenCommitment = bc_param.extend_commit(old_commitment, new_values)
-    #     return new_pcommit
-
-    
     def abe_commit(
         self,
         commitment: PedersenCommitment
